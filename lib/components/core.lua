@@ -92,21 +92,18 @@ function core.vspace(dy)
     return lcc.tpl.vspace { dy = dy }
 end
 
-lcc.tpl.datetime = [[
-${color0}${voffset $sr{2}}${lua font date ${time %b %-d}}${alignr}#
-${lua font time ${time %H:%M}${voffset $sr{-35}} ${time %H:%M}${voffset $sr{-40}} time_alt}
-${alignc}${lua font week ${time %^A}}
-${alignc}${lua font year ${time %Y}}${color}
-${voffset $sr{-8}}]]
+lcc.tpl.datetime = [[${lua font time ${time %H:%M}}${alignr}${lua font time ${time %d.%m.%Y}}
+${alignc}${lua font week Ein} ${time %A} im ${time %B %-Y}]]
 function core.datetime()
     return lcc.tpl.datetime()
 end
 
 lcc.tpl.system = [[
-${font}${sysname} ${kernel} ${alignr}${machine}
-Host:${alignr}${nodename}
+${font}Host:${alignr}${nodename}
+OS:${alignr}${texeci 3600 lsb_release -d | awk '{$1=""; print $0}'}
+Kernel:${alignr}${kernel} (${machine})
 Uptime:${alignr}${uptime}
-Processes:${alignr}${running_processes} / ${processes}]]
+]]
 function core.system(args)
     return core.section("SYSTEM", "") .. "\n" .. lcc.tpl.system()
 end
@@ -152,6 +149,9 @@ end
 lcc.tpl.cpu = [[
 ${font}${execi 3600 grep model /proc/cpuinfo | cut -d : -f2 | tail -1 | sed 's/\s//'} ${alignr} ${cpu cpu0}%
 ${color3}${cpugraph cpu0}${color}
+Processes:${alignr}${processes}
+CPU Frequency:${color}${alignr}${freq}MHz
+CPU Temperature:${color}${alignr}${texeci 30 sensors | grep "edge" | cut -d ':' -f 2 | cut -d '(' -f 1 | tr -d ' '}
 {% if top_cpu_entries then %}
 ${color2}${lua font h2 {PROCESS ${goto $sr{156}}PID ${goto $sr{194}}MEM% ${alignr}CPU%}}${font}${color}#
 {% for _, v in ipairs(top_cpu_entries) do +%}
