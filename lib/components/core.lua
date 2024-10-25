@@ -262,6 +262,14 @@ function conky_ifaces(interv)
     end)
 end
 
+lcc.tpl.monitor = [[${font}{% for name, url in pairs(lcc.config.urls) do %}
+{%= name %}:${alignr}${execpi 300 curl {%= url %} -c /tmp/cookie.txt -L -k -s -f -o /dev/null && echo "ACTIVE" || echo "\${color red}ERROR \${color}"}
+{% end %}
+]]
+function core.monitor()
+    return core.section("MONITOR", "") .. "\n" .. lcc.tpl.monitor()
+end
+
 ----------------------------
 -- utils for internal use --
 ----------------------------
